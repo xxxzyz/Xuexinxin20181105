@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="mColors">
+
+        <attr name="red" format="color"></attr>
+        <attr name="yellow" format="color"></attr>
+    </declare-styleable>
+
+</resources>
