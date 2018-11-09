@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -26,13 +27,11 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
     private Thread mThread;
     private Canvas mCanvas;
     private boolean isRunning;
-
+    public MyListener mMyListener;
     //开始设置字体
     private String[] mTexts=new String[]{"谢谢参与","一等奖","二等奖","三等奖","四等奖","参与奖"};
     //设置颜色
 
-
-    Context context;
 
     private Bitmap mBgBitmap=BitmapFactory.decodeResource(getResources(),R.mipmap.bg2);
     //设置画笔
@@ -73,14 +72,14 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
         //设置常亮
         setKeepScreenOn(true);
 
-        TypedArray a=context.obtainStyledAttributes(attrs,R.styleable.mColors);
-       mColors=new int[]{a.getColor(R.styleable.mColors_red,Color.RED),
-               a.getColor(R.styleable.mColors_red,Color.YELLOW)
-               ,a.getColor(R.styleable.mColors_red,Color.RED),
-               a.getColor(R.styleable.mColors_red,Color.YELLOW),
-               a.getColor(R.styleable.mColors_red,Color.RED),
-               a.getColor(R.styleable.mColors_red,Color.YELLOW),
-               a.getColor(R.styleable.mColors_red,Color.RED)
+        TypedArray a=context.obtainStyledAttributes(attrs,R.styleable.LuckyPan);
+       mColors=new int[]{a.getColor(R.styleable.LuckyPan_red,Color.RED),
+               a.getColor(R.styleable.LuckyPan_yellow,Color.YELLOW),
+               a.getColor(R.styleable.LuckyPan_red,Color.RED),
+               a.getColor(R.styleable.LuckyPan_yellow,Color.YELLOW),
+               a.getColor(R.styleable.LuckyPan_red,Color.RED),
+               a.getColor(R.styleable.LuckyPan_yellow,Color.YELLOW),
+               a.getColor(R.styleable.LuckyPan_red,Color.RED)
         };
 
     }
@@ -98,7 +97,10 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
         mCenter=width/2;
         setMeasuredDimension(width,width);
 
+
+
     }
+
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -116,9 +118,7 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
         mTextPaint=new Paint();
         mTextPaint.setColor(Color.WHITE);
         mTextPaint.setTextSize(mTextSize);
-
         mRange=new RectF(mPadding,mPadding,mPadding+mRedius,mPadding+mRedius);
-
 
 
     }
@@ -158,8 +158,8 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
             mCanvas=mHolder.lockCanvas();
             if(mCanvas!=null){
                //绘制背景
-                drawBg();
-                
+               drawBg();
+
                 int tmpAngle=mStartAngle;
                 int sweepAngle=360/count;
                 for (int i = 0; i <count ; i++) {
@@ -170,6 +170,8 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
 
                     tmpAngle+=sweepAngle;
                 }
+                //画圆
+               // mCanvas.drawCircle(getMeasuredWidth()/2,getMeasuredWidth()/2,100,mTextPaint);
                 //速度
                mStartAngle+=mSpeed;
                 //如果点击停止按钮，速度递减
@@ -179,6 +181,7 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
                 if(mSpeed<=0){
                     mSpeed=0;//速度设置为0
                     isShouldEnd=false;
+                    mMyListener.isEnd(isShouldEnd);
                 }
             }
         } catch (Exception e){
@@ -191,20 +194,32 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
     public void luckyStart(){
         mSpeed=50;
         isShouldEnd=false;
+        mMyListener.isEnd(isShouldEnd);
     }
     //是否按下结束
     public void luckyEnd(){
-
         isShouldEnd=true;
+        mMyListener.isEnd(isShouldEnd);
     }
     //判断是否开始
     public boolean isStart(){
         return mSpeed!=0;
     }
     public boolean isShouldEnd(){
+
         return isShouldEnd;
     }
-  //绘制文本
+    //接口回调
+    public interface MyListener{
+       void isEnd(boolean isShouldEnd);
+    }
+
+
+    public void setMyListener(MyListener myListener) {
+        mMyListener = myListener;
+    }
+
+    //绘制文本
     private void drawText(int tmpAngle, int sweepAngle, String text) {
         Path path=new Path();
         path.addArc(mRange,tmpAngle,sweepAngle);
@@ -218,7 +233,8 @@ public class LuckyPan extends SurfaceView implements SurfaceHolder.Callback,Runn
     //绘制背景
     private void drawBg() {
         mCanvas.drawColor(Color.WHITE);
-        mCanvas.drawBitmap(mBgBitmap,null,new RectF(mPadding/2,mPadding/2,getMeasuredWidth()-mPadding/2
-        ,getMeasuredHeight()-mPadding/2),null);
+        //背景图片
+        //mCanvas.drawBitmap(mBgBitmap,null,new RectF(mPadding/2,mPadding/2,getMeasuredWidth()-mPadding/2
+        //,getMeasuredHeight()-mPadding/2),null);
     }
 }

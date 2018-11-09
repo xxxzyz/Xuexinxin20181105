@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -38,6 +39,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ok = (TextView) findViewById(R.id.ok);
         ok.setOnClickListener(this);
+      luck.setMyListener(new LuckyPan.MyListener() {
+          @Override
+          public void isEnd(boolean isShouldEnd) {
+              Toast.makeText(MainActivity.this,isShouldEnd+"",Toast.LENGTH_SHORT).show();
+          }
+      });
     }
 
     //点击事件
@@ -55,4 +62,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
               }
           }
     }
+
 }
